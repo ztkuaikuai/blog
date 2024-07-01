@@ -2,8 +2,8 @@ import rss, {pagesGlobToRssItems} from '@astrojs/rss';
 
 export async function GET(context) {
   return rss({
-    title: 'nicdun.dev - blog',
-    description: 'Crafting the Digital Future with Web Development Wonders',
+    title: '筷筷的blog',
+    description: '我的人类使用说明书',
     site: context.site,
     items: await pagesGlobToRssItems(
       import.meta.glob('./posts/*.{md,mdx}'),

@@ -1,9 +1,9 @@
 ---
 interface Props {
-	href: string;
+	href: string
 }
 
-const { href } = Astro.props;
+const { href } = Astro.props
 ---
 
 <div
@@ -12,12 +12,7 @@ const { href } = Astro.props;
 	<a
 		href={href}
 		target="_blank"
-		class="flex h-full w-full items-center justify-center rounded-[0.7rem] bg-stone-300
-		p-4
-		text-gray-900
-    opacity-90
-    dark:bg-stone-800
-		dark:text-white"
+		class="flex h-full w-full items-center justify-center rounded-[0.7rem] bg-stone-300 p-4 text-gray-900 opacity-90 dark:bg-stone-800 dark:text-white"
 	>
 		<slot />
 	</a>
