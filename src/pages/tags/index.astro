@@ -14,7 +14,7 @@ const allTags: Set<string> = new Set(allPosts.map((post) => post.frontmatter.tag
 ---
 
 <Base head={{ title, description }}>
-	<Section><Heading title="Tags" /></Section>
+	<Section><Heading title="所有标签" /></Section>
 	<div class="mx-auto w-full max-w-screen-md">
 		<Tags tags={[...allTags]} withHref={true} />
 	</div>
