@@ -9,6 +9,6 @@ export async function GET(context) {
       import.meta.glob('./posts/*.{md,mdx}'),
     ),
     stylesheet: './rss/styles.xsl',
-    customData: `<language>en-us</language>`,
+    customData: `<language>zh-cn</language>`,
   });
 }
