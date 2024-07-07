@@ -1,7 +1,7 @@
 ---
 layout: ../../layouts/post.astro
 title: "Vue 常见优化手段"
-pubDate: 2024-07-05
+pubDate: 2024-07-07
 description: "Vue 常见优化手段"
 author: "筷筷"
 excerpt: 探索Vue框架中提升应用性能的多种策略。
