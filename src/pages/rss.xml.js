@@ -18,7 +18,7 @@ export async function GET(context) {
       }),
       ...post.frontmatter,
     })),
-    // stylesheet: '/rss/styles.xsl',
+    stylesheet: '/rss/styles.xsl',
     customData: `<language>zh-cn</language>`,
   });
 }
