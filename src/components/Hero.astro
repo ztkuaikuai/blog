@@ -10,11 +10,11 @@ const site = Astro.site;
 	<p class="pb-2 pt-6 text-4xl font-bold">Hi~ o(*￣▽￣*)ブ</p>
 	<div class="text-sm">
 		<p class="py-2">
-			欢迎来访我的博客~
+			欢迎来访我的博客
 		</p>
 	</div>
 	<div class="flex">
-		<Social href="https://github.com/ztkuaikuai">
+		<Social href="https://github.com/ztkuaikuai" ariaLabel='我的GitHub'>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				class="h-4 w-4"
@@ -26,7 +26,7 @@ const site = Astro.site;
 				></path>
 			</svg>
 		</Social>
-		<Social href={`${site}rss.xml`}>
+		<Social href={`${site}rss.xml`} ariaLabel='通过RSS订阅我的博客'>
 			<svg viewBox="0 0 24 24" width="1.2em" height="1.2em"
 				><path
 					fill="currentColor"
