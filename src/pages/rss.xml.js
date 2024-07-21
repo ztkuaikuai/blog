@@ -14,8 +14,7 @@ export async function GET(context) {
     items: posts.map((post) => ({
       link: post.url,
       content: sanitizeHtml(post.compiledContent(), {
-        allowedTags: false,
-        allowedAttributes: false
+        allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img'])
       }),
       ...post.frontmatter,
     })),
