@@ -1,12 +1,12 @@
 ---
-import { AppConfig } from '@/utils/AppConfig';
-import Base from '@/layouts/Base.astro';
-import PostHeader from '@/components/PostHeader.astro';
-import PostContent from '@/components/PostContent.astro';
+import { AppConfig } from '@/utils/AppConfig'
+import Base from '@/layouts/Base.astro'
+import PostHeader from '@/components/PostHeader.astro'
+import PostContent from '@/components/PostContent.astro'
 
-const { description } = AppConfig;
+const { description } = AppConfig
 
-const { frontmatter } = Astro.props;
+const { frontmatter } = Astro.props
 ---
 
 <Base head={{ title: frontmatter.title, description }}>
@@ -20,6 +20,52 @@ const { frontmatter } = Astro.props;
 			img={{ src: frontmatter.image.src, alt: frontmatter.image.alt }}
 		/>
 		<PostContent><slot /></PostContent>
+		<div id="comment">
+			<script>
+				const getTheme = () => localStorage.getItem("dark-mode") === "true" ? "dark" : "light"
+				document.addEventListener("DOMContentLoaded", () => {
+					const giscusAttributes = {
+						"src": "https://giscus.app/client.js",
+						"data-repo": "ztkuaikuai/blog",
+						"data-repo-id": "R_kgDOMOQBZQ",
+						"data-category": "General",
+						"data-category-id": "DIC_kwDOMOQBZc4ChGgl",
+						"data-mapping": "title",
+						"data-strict": "0",
+						"data-reactions-enabled": "1",
+						"data-emit-metadata": "0",
+						"data-input-position": "top",
+						"data-theme": getTheme(),
+						"data-lang": "zh-CN",
+						"data-loading": "lazy",
+						"crossorigin": "anonymous",
+						"async": ""
+					}
+
+					// 动态创建script标签
+					const giscusScript = document.createElement("script")
+					Object.entries(giscusAttributes).forEach(
+						([key, value]) => giscusScript.setAttribute(key, value))
+					document.getElementById("comment")!.appendChild(giscusScript)
+				})
+			</script>
+			<!-- <script
+				src="https://giscus.app/client.js"
+				data-repo="ztkuaikuai/blog"
+				data-repo-id="R_kgDOMOQBZQ"
+				data-category="General"
+				data-category-id="DIC_kwDOMOQBZc4ChGgl"
+				data-mapping="title"
+				data-strict="0"
+				data-reactions-enabled="1"
+				data-emit-metadata="0"
+				data-input-position="top"
+				data-theme="light"
+				data-lang="zh-CN"
+				data-loading="lazy"
+				crossorigin="anonymous"
+				async
+			></script> -->
+		</div>
 	</div>
 </Base>
-

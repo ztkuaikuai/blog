@@ -18,7 +18,7 @@ import Section from './Section.astro';
 					<li><a href="/tags" class="hover:text-orange-600">标签</a></li>
 				</ul>
 			</nav>
-			<div class="ml-3 flex flex-col justify-center">
+			<div class="ml-3 flex flex-col justify-center" id="themeswitch">
 				<input type="checkbox" id="light-switch" class="light-switch sr-only" />
 				<label class="tada relative cursor-pointer p-2" for="light-switch">
 					<svg class="dark:hidden" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
@@ -63,9 +63,17 @@ import Section from './Section.astro';
 				if (lightSwitch.checked) {
 					document.documentElement.classList.add('dark');
 					localStorage.setItem('dark-mode', 'true');
+					const iframe: any = document.querySelector('iframe.giscus-frame');
+					if (iframe) {
+						iframe.contentWindow.postMessage({ giscus: { setConfig: { theme: "dark" } } }, 'https://giscus.app');
+					}
 				} else {
 					document.documentElement.classList.remove('dark');
 					localStorage.setItem('dark-mode', 'false');
+					const iframe: any = document.querySelector('iframe.giscus-frame');
+					if (iframe) {
+						iframe.contentWindow.postMessage({ giscus: { setConfig: { theme: "light" } } }, 'https://giscus.app');
+					}
 				}
 			});
 		});
