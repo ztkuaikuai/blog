@@ -51,7 +51,10 @@ import Section from './Section.astro';
 	if (lightSwitches.length > 0) {
 		lightSwitches.forEach((lightSwitch: any, i) => {
 			if (localStorage.getItem('dark-mode') === 'true') {
+				document.documentElement.style.colorScheme = 'dark'
 				lightSwitch.checked = true;
+			} else {
+				document.documentElement.style.colorScheme = 'light'
 			}
 			lightSwitch.addEventListener('click', () => {
 				const { checked } = lightSwitch;
@@ -62,6 +65,8 @@ import Section from './Section.astro';
 				});
 				if (lightSwitch.checked) {
 					document.documentElement.classList.add('dark');
+					// 获取html的DOM元素，给其style加上color-scheme，为了适配滚动条的暗黑模式
+					document.documentElement.style.colorScheme = 'dark'
 					localStorage.setItem('dark-mode', 'true');
 					const iframe: any = document.querySelector('iframe.giscus-frame');
 					if (iframe) {
@@ -69,6 +74,7 @@ import Section from './Section.astro';
 					}
 				} else {
 					document.documentElement.classList.remove('dark');
+					document.documentElement.style.colorScheme = 'light'
 					localStorage.setItem('dark-mode', 'false');
 					const iframe: any = document.querySelector('iframe.giscus-frame');
 					if (iframe) {
