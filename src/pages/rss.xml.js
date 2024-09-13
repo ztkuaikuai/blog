@@ -8,7 +8,6 @@ export async function GET(context) {
     title: '筷筷的博客',
     link: 'blog.kuaikuaitz.top',
     description: '我的人类使用说明书',
-    description: 'feedId:56926357887407104+userId:56925868802200576',
     author: "筷筷",
     commentsUrl: "https://github.com/ztkuaikuai",
     site: context.site,
