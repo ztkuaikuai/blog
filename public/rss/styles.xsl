@@ -69,6 +69,10 @@ This file is in BETA. Please test and contribute to the discussion:
                 xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/"
                 xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
   <xsl:output method="html" version="1.0" encoding="UTF-8" indent="yes"/>
+  <follow_challenge>
+    <feedId>56926357887407104</feedId>
+    <userId>56925868802200576</userId>
+  </follow_challenge>
   <xsl:template match="/">
     <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
       <head>
