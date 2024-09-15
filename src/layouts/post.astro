@@ -50,5 +50,31 @@ const { frontmatter } = Astro.props
 				})
 			</script>
 		</div>
+		<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/viewerjs/1.11.6/viewer.min.css">
+		<script src="https://cdn.bootcdn.net/ajax/libs/viewerjs/1.11.6/viewer.min.js" defer></script>
+		<script type="module">
+			const imgs = document.querySelectorAll("img")
+			imgs.forEach(item => {
+				new Viewer(item, {
+					button: false,
+					navbar: false,
+					title: false,
+					toolbar: {
+						zoomIn: 4,
+						zoomOut: 4,
+						oneToOne: 4,
+						reset: 0,
+						prev: 0,
+						play: 0,
+						next: 0,
+						rotateLeft: 4,
+						rotateRight: 4,
+						flipHorizontal: 0,
+						flipVertical: 0
+					},
+
+				})
+			})
+		</script>
 	</div>
 </Base>
