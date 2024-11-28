@@ -23,7 +23,7 @@ tags: ["网络", "WebSocket", "InterView"]
 
 上述场景有一个共同的特点——<mark style="background: #FFF3A3A6;">实时性</mark>
 
-这种对实时性有要求的也米娜，会带来一些问题
+这种对实时性有要求的页面，会带来一些问题
 
 比如下面的聊天场景
 
