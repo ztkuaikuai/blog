@@ -21,3 +21,6 @@ pnpm-debug.log*
 # for test
 example.md
 筷筷小报.md
+
+# build
+.vercel/
