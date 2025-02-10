@@ -44,9 +44,8 @@ const { frontmatter } = Astro.props
 
 					// 动态创建script标签
 					const giscusScript = document.createElement("script")
-					Object.entries(giscusAttributes).forEach(
-						([key, value]) => giscusScript.setAttribute(key, value))
-					document.getElementById("comment")!.appendChild(giscusScript)
+					Object.entries(giscusAttributes).forEach(([key, value]) => giscusScript.setAttribute(key, value))
+					document.getElementById("comment")?.appendChild(giscusScript)
 				})
 			</script>
 		</div>
@@ -72,7 +71,6 @@ const { frontmatter } = Astro.props
 						flipHorizontal: 0,
 						flipVertical: 0
 					},
-
 				})
 			})
 		</script>
