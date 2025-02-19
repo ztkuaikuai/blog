@@ -63,11 +63,11 @@ tags: ["筷筷月报", "筷筷小报"]
 
 趁着新年这大段时间，我通关了山河旅探、沉默意志（最近还全成就了，豪玩👍）、和侄女一起通关了星之卡比探索发现。最近小红书上天天给我推喷 3 的游戏画面，搞得我想再买一个 Switch 自己玩了呜呜。
 
-### 4 搭建了自己的图床🎉
+### 4 搭建了自己的图床 🎉
 
 现在支持直接复制图片到 Obsidian，自动上传到图床并展示，大大提高了写文章的效率！！感谢[从零开始搭建你的免费图床系统（Cloudflare R2 + WebP Cloud + PicGo）](https://www.pseudoyu.com/zh/2024/06/30/free_image_hosting_system_using_r2_webp_cloud_and_picgo/)， [image auto upload](https://github.com/renmu123/obsidian-image-auto-upload-plugin)👏
 
-将手工操作流程替换成自动化，真的好爽啊，体感上我更愿意配图了，写文幸福感直线上升，也不用担心 GitHub 仓库不够用的情况了！
+将手工操作流程替换成自动化，真的好爽啊，体感上我更愿意配图了，写文幸福感直线上升，也不用担心 GitHub 仓库容量不够用的情况了！
 
 ---
 
