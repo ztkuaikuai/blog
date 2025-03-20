@@ -1,8 +1,8 @@
 ---
 layout: ../../layouts/post.astro
-title: "筷筷月报#17 - 借助 AI 做开源丨开始养植物丨新时代下程序员的核心价值"
+title: "借助 AI 做开源丨开始养植物丨新时代下程序员的核心价值 - 筷筷月报#17"
 pubDate: 2025-03-19
-description: "筷筷月报#17 - 借助 AI 做开源丨开始养植物丨新时代下程序员的核心价值"
+description: "借助 AI 做开源丨开始养植物丨新时代下程序员的核心价值 - 筷筷月报#17"
 author: "筷筷"
 excerpt: 筷筷月报#17 分享了作者在二月的经历和思考。作者借助 AI 的能力，成功为 AntD X 提交了 PR 并上线，体验到了前所未有的成就感。同时，作者开始养植物，从购买发财树到种植牵牛花，感受到了生命的成长和不确定性带来的乐趣。开源动态部分介绍了 D2 终端技术大会和 TypeScript 宣布将移植到 Go 语言的消息。工具推荐包括适用于 React、Vue 和 Svelte 的动画数字组件 number-flow，以及受 Dieter Rams 设计原则启发的 Framer 组件 Drams。视频推荐涵盖了前端技术、程序员核心价值、代码质量取舍以及 TypeScript 重写等多个主题。文章推荐则涉及 JavaScript 中分解长任务的方法、AI 对程序员的影响、CSS 属性的使用等。播客推荐聚焦于 AI、创业、技术演进等话题。句子部分分享了关于感激、成功和时间的思考。
 image:  
@@ -47,6 +47,7 @@ tags: ["筷筷月报", "筷筷小报"]
 
 ![img_v3_02kg_255be001-f4aa-4f5d-857d-8f5e7e6a13ag.jpg](https://webp.kuaikuaitz.top/img_v3_02kg_255be001-f4aa-4f5d-857d-8f5e7e6a13ag.jpg)
 
+---
 
 # 开源动态
 
