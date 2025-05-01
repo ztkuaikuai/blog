@@ -46,7 +46,7 @@ const {
 		</script>
 	</head>
 	<body
-		class="flex min-h-screen flex-col bg-stone-100 font-mono text-gray-950 dark:bg-stone-900 dark:text-white"
+		class="flex min-h-screen flex-col bg-stone-100 font-sans text-gray-950 dark:bg-stone-900 dark:text-white"
 	>
 		<Navbar />
 			<div class="flex-1">
@@ -57,5 +57,11 @@ const {
 </html>
 <style is:global>
 	:root {
+	}
+	
+	body {
+		font-family: "Microsoft YaHei", -apple-system, BlinkMacSystemFont, sans-serif;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
 	}
 </style>
