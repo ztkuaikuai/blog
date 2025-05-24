@@ -1,0 +1,122 @@
+---
+import Base from '@/layouts/Base.astro'
+import Section from '@/components/Section.astro'
+import Heading from '@/components/Heading.astro'
+import { AppConfig } from '@/utils/AppConfig'
+
+const { title } = AppConfig
+const { description } = AppConfig
+---
+
+<Base head={{ title, description }}>
+	<Section>
+		<Heading title="关于我" align="left" />
+		<article class="prose pt-8">
+			<p class="lead">
+				欢迎你探索这里，我是筷筷，一名前端开发工程师，这是我入坑前端的第二年，长期目标是成为一个具有良好审美、创造力且可独立开发产品的产品工程师，我正在朝这个目标努力中！
+			</p>
+			<p>
+				我目前专注于前端领域，使用的技术栈包括但不限于 React、Vue、Mini Program 等，正在学习 Next.js 与 Astro。在百度 MEG 下担任前端开发工程师。
+			</p>
+			<p>
+				每月我会产出<a href="/tags/筷筷月报" target="_blank">筷筷月报</a>，在其中会将我的一部分月度复盘以及我看过觉得好的文章、视频、播客等内容（主要是前端领域）写在里面，也可简单理解为我对上个月的复盘 + 前端领域的 Newsletter。
+			</p>
+			<h2>🧩产品</h2>
+			<p>下面是一些我做的一些个人项目或 Demo：</p>
+			<ul>
+				<li>
+					<a href="https://github.com/ztkuaikuai/MiaoJi" target="_blank">妙记</a>：轻量记账小程序，在微信搜索妙记账单体验，使用 Uniapp 与 UniCloud 进行开发。
+				</li>
+				<li>
+					<a href="https://icebreaker.kuaikuaitz.top/" target="_blank">破🧊</a>：一个可供陌生人破冰的网站，使用 Next.js 开发，使用了 PWA 技术可离线使用。
+				</li>
+			</ul>
+			<h2>🔍找到我的方式</h2>
+			<ul>
+				<li>
+					GitHub：<a href="https://github.com/ztkuaikuai" target="_blank">ztkuaikuai</a>
+				</li>
+				<li>
+					哔哩哔哩：<a href="https://space.bilibili.com/8692067" target="_blank">砖吐筷筷</a>
+				</li>
+				<li>
+					小红书：<a href="https://www.xiaohongshu.com/user/profile/5c0d9c0e0000000005025831" target="_blank">筷筷</a>
+				</li>
+				<li>微信：kuaikuaitz（请注明来源~）</li>
+				<li>邮箱：contact@kuaikuaitz.top</li>
+			</ul>
+			<h2>📅和我约个时间交流</h2>
+			<p>
+				<strong>欢迎和我一对一交流，我喜欢链接他人与他人沟通的感觉</strong>，我还算擅长：
+			</p>
+			<ul>
+				<li>前端求职相关疑问</li>
+				<li>学习过程中遇到的疑惑/对大学生活感到迷茫随波逐流</li>
+				<li>职业发展规划与建议（需要提前说明的是，目前我只有不到两年工作经历）</li>
+				<li>讨论游戏、番剧</li>
+				<li>讨论女性主义相关议题</li>
+				<li>其他任何闲聊</li>
+			</ul>
+			<p>希望我能够在沟通中给到你一些新的角度，也欢迎和我交朋友！</p>
+			<!-- Cal element-click embed code begins -->
+			<script type="text/javascript">
+				;(function (C, A, L) {
+					let p = function (a, ar) {
+						a.q.push(ar)
+					}
+					let d = C.document
+					C.Cal =
+						C.Cal ||
+						function () {
+							let cal = C.Cal
+							let ar = arguments
+							if (!cal.loaded) {
+								cal.ns = {}
+								cal.q = cal.q || []
+								d.head.appendChild(d.createElement('script')).src = A
+								cal.loaded = true
+							}
+							if (ar[0] === L) {
+								const api = function () {
+									p(api, arguments)
+								}
+								const namespace = ar[1]
+								api.q = api.q || []
+								if (typeof namespace === 'string') {
+									cal.ns[namespace] = cal.ns[namespace] || api
+									p(cal.ns[namespace], ar)
+									p(cal, ['initNamespace', namespace])
+								} else p(cal, ar)
+								return
+							}
+							p(cal, ar)
+						}
+				})(window, 'https://app.cal.com/embed/embed.js', 'init')
+				Cal('init', '30min', { origin: 'https://cal.com' })
+
+				// Important: Please add the following attributes to the element that should trigger the calendar to open upon clicking.
+				// `data-cal-link="kuaikuaitz/30min"`
+				// data-cal-namespace="30min"
+				// `data-cal-config='{"layout":"month_view"}'`
+
+				Cal.ns['30min']('ui', { hideEventTypeDetails: false, layout: 'month_view' })
+			</script>
+			<button
+                data-cal-namespace="30min"
+                data-cal-link="kuaikuaitz/30min"
+                data-cal-config='{"layout":"month_view"}'
+                class="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-300 rounded-md px-3 py-1.5 text-sm font-normal cursor-pointer"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <rect x="3" y="4" width="18" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M8 2v4M16 2v4M3 10h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                与我预约沟通
+            </button>
+			<!-- Cal element-click embed code ends -->
+            <blockquote>
+                <p class="text-gray-500 text-sm">请在备注中注明这场交流的主题是什么，如果想要问我的问题也请在备注附上~</p>
+            </blockquote>
+		</article>
+	</Section>
+</Base>

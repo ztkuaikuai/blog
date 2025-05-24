@@ -1,9 +1,11 @@
 ---
 interface Props {
 	title: string;
+	align?: 'left' | 'center' | 'right';
 }
 
 const { title } = Astro.props;
+const { align = 'center' } = Astro.props;
 ---
 
-<p class="text-bold pt-6 text-center text-4xl">{title}</p>
+<p class=`text-bold pt-6 text-${align} text-4xl`>{title}</p>
