@@ -42,6 +42,7 @@ const { posts } = Astro.props;
 		{
 			posts
 				.filter((post: any) => post.frontmatter.tags?.includes(tag))
+				.sort((postA: any, postB: any) => new Date(postB.frontmatter.pubDate).getTime() - new Date(postA.frontmatter.pubDate).getTime())
 				.map((post: any) => (
 					<div class="mb-4 basis-1 last:mb-0">
 						<Card post={post} />
