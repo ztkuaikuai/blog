@@ -63,25 +63,25 @@ snapDOM 能以极高的速度和精度将 HTML 元素捕获为图像，比 `html
 ---
 # 视频
 
-### 1 [代码与工程之外 | 为什么“热门方向”不等于“好方向”？如何选择好的技术方向](代码与工程之外【5】| 为什么“热门方向”不等于“好方向”？如何选择好的技术方向_哔哩哔哩_bilibili)
+### 1 [代码与工程之外 | 为什么“热门方向”不等于“好方向”？如何选择好的技术方向](https://www.bilibili.com/video/BV1izGVz7Ey4?spm_id_from=333.1245.0.0)
 
-### 2 [你是不是在找？前端交互➡️学习路线➡️](你是不是在找？前端交互➡️学习路线➡️_哔哩哔哩_bilibili)
+### 2 [你是不是在找？前端交互➡️学习路线➡️](https://www.bilibili.com/video/BV1CCuxzHEus/?share_source=copy_web&vd_source=27102c235ff3a9369a44716ba38084f3)
 
-### 3 [VueConf 2025，VoidZero 创始人 & CEO，Vue.js & Vite 作者尤雨溪主题演讲！](VueConf 2025，VoidZero 创始人 & CEO，Vue.js & Vite 作者尤雨溪主题演讲！_哔哩哔哩_bilibili)
+### 3 [VueConf 2025，VoidZero 创始人 & CEO，Vue.js & Vite 作者尤雨溪主题演讲！](https://www.bilibili.com/video/BV1fyu9zsEAf?spm_id_from=333.1245.0.0)
 
 发布了 Vue 3.6，推出 Vapor Mode 模式——为了极致性能而存在的全新的编译和渲染模式，去掉了虚拟DOM，获得更快的运行时性能。同时还谈到了未来 Vite 与 AI 的结合。
 
-### 4 [⭐Multi-Agent：是解药还是安慰剂？](Multi-Agent：是解药还是安慰剂？_哔哩哔哩_bilibili)
+### 4 [⭐Multi-Agent：是解药还是安慰剂？](https://www.bilibili.com/video/BV1Asgyz3EAY?spm_id_from=333.1245.0.0)
 
 ### 5 网页设计案例
 
-[拥有卓越造型创造能力的顶级设计工作室](https://www.bilibili.com/video/BV1z7gPzXE8K?spm_id_from=333.1245.0.0)
+[拥有卓越造型创造能力的顶级设计工作室](https://www.bilibili.com/video/BV1z7gPzXE8K/?share_source=copy_web&vd_source=27102c235ff3a9369a44716ba38084f3)
 
-[不拘一格的前卫金融品牌指导](https://www.bilibili.com/video/BV1bt89zZEbn?spm_id_from=333.1245.0.0)
+[不拘一格的前卫金融品牌指导](https://www.bilibili.com/video/BV1bt89zZEbn/?share_source=copy_web&vd_source=27102c235ff3a9369a44716ba38084f3)
 
 #审美积累
 
-### 6 [计算机核心思想系列 | 复杂系统中的定海神针：不可变](计算机核心思想系列【3】| 复杂系统中的定海神针：不可变_哔哩哔哩_bilibili)
+### 6 [计算机核心思想系列 | 复杂系统中的定海神针：不可变](https://www.bilibili.com/video/BV1du86zYE6R?spm_id_from=333.1245.0.0)
 
 不可变带来的好处：可回退，可追踪，没有副作用带来的心智负担😭
 
