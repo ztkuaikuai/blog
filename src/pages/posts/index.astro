@@ -1,4 +1,5 @@
 ---
+import type { MarkdownInstance } from 'astro';
 import { AppConfig } from '@/utils/AppConfig';
 import Base from '@/layouts/Base.astro';
 import Section from '@/components/Section.astro';
@@ -9,7 +10,7 @@ import { sortPostsByDate } from '@/utils/data.util';
 const { title } = AppConfig;
 const { description } = AppConfig;
 
-const allPosts = await Astro.glob('./*.md');
+const allPosts = Object.values(import.meta.glob<MarkdownInstance<Record<string, any>>>('./*.md', { eager: true }));
 allPosts.sort(sortPostsByDate);
 ---
 

@@ -11,14 +11,14 @@ export async function GET(context) {
     author: "筷筷",
     commentsUrl: "https://github.com/ztkuaikuai",
     site: context.site,
-    items: posts
-      .map((post) => ({
+    items: (await Promise.all(posts
+      .map(async (post) => ({
         link: post.url,
-        content: sanitizeHtml(post.compiledContent(), {
+        content: sanitizeHtml(await post.compiledContent(), {
           allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img'])
         }),
         ...post.frontmatter,
-      }))
+      }))))
       .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate)),
     stylesheet: '/rss/styles.xsl',
     customData: `<language>zh-cn</language>`,
