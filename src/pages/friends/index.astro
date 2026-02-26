@@ -1,0 +1,58 @@
+---
+import Base from '@/layouts/Base.astro';
+import Section from '@/components/Section.astro';
+import { AppConfig } from '@/utils/AppConfig';
+
+const title = `友链 | ${AppConfig.title}`;
+const description = '一些我在关注的朋友和他们的网站。';
+
+const friends = [
+	{
+		url: 'https://lemonadec.cc/',
+		owner: 'Lemonadeccc',
+		desc: 'miaomiao',
+		image:
+			'https://avatars.githubusercontent.com/u/82374719?s=400&u=109136b7732ac9bfcdc5819381beb035e48c7ffa&v=4'
+	}
+];
+---
+
+<Base head={{ title, description }}>
+	<Section>
+		<h1 class="pt-6 text-center text-4xl font-bold text-balance">友链</h1>
+	</Section>
+	<Section>
+		<ul class="mx-auto max-w-96 space-y-4">
+			{
+				friends.map((friend) => (
+					<li>
+						<article
+							class="rounded-2xl border border-stone-300 bg-stone-200/60 p-4 dark:border-stone-700 dark:bg-stone-800/80"
+						>
+							<a
+								href={friend.url}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="flex items-center justify-center gap-4"
+							>
+								<img
+									src={friend.image}
+									alt={`${friend.owner} avatar`}
+									loading="lazy"
+									decoding="async"
+									class="size-14 shrink-0 rounded-full object-cover"
+								/>
+								<div class="min-w-0 flex-1">
+									<h2 class="text-lg font-semibold text-pretty">{friend.owner}</h2>
+									<p class="mt-1 text-sm text-pretty text-stone-600 dark:text-stone-300">
+										{friend.desc}
+									</p>
+								</div>
+							</a>
+						</article>
+					</li>
+				))
+			}
+		</ul>
+	</Section>
+</Base>
