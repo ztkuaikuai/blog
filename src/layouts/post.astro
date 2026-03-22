@@ -50,8 +50,8 @@ const { frontmatter } = Astro.props
 			</script>
 		</div>
 		<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/viewerjs/1.11.6/viewer.min.css">
-		<script src="https://cdn.bootcdn.net/ajax/libs/viewerjs/1.11.6/viewer.min.js" defer></script>
-		<script type="module">
+		<script is:inline src="https://cdn.bootcdn.net/ajax/libs/viewerjs/1.11.6/viewer.min.js" defer></script>
+		<script is:inline type="module">
 			const imgs = document.querySelectorAll("img")
 			imgs.forEach(item => {
 				new Viewer(item, {

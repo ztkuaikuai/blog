@@ -2,6 +2,9 @@
 	"name": "kkblog",
 	"type": "module",
 	"version": "1.0.0",
+	"engines": {
+		"node": ">=22.12.0"
+	},
 	"scripts": {
 		"dev": "astro dev --open",
 		"start": "astro dev --open",
@@ -10,15 +13,15 @@
 		"astro": "astro"
 	},
 	"dependencies": {
-		"@astrojs/check": "^0.9.6",
-		"@astrojs/react": "^4.4.2",
-		"@astrojs/rss": "^4.0.15",
-		"@astrojs/sitemap": "^3.7.0",
-		"@astrojs/vercel": "^9.0.4",
+		"@astrojs/check": "^0.9.8",
+		"@astrojs/react": "^5.0.1",
+		"@astrojs/rss": "^4.0.17",
+		"@astrojs/sitemap": "^3.7.1",
+		"@astrojs/vercel": "^10.0.2",
 		"@types/react": "^18.2.45",
 		"@types/react-dom": "^18.2.18",
 		"@vercel/analytics": "^1.2.2",
-		"astro": "^5.17.1",
+		"astro": "^6.0.8",
 		"canvas-confetti": "^1.9.2",
 		"mdast-util-to-string": "^4.0.0",
 		"react": "^18.2.0",
