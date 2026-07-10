@@ -57,3 +57,13 @@ pnpm astro check
 - 保持 `src/components/Navbar.astro` 中的导航链接与页面路由同步。
 - 除非布局策略发生变化，新文章应继续使用 `../../layouts/post.astro`。
 - 如果元数据（网站标题/描述/作者）发生变化，请更新 `src/utils/AppConfig.ts`。
+
+## Agent skills
+
+### Issue tracker
+
+Issue 以 GitHub Issues 形式管理，仓库 `ztkuaikuai/blog`，使用 `gh` CLI 操作。详见 `docs/agents/issue-tracker.md`。
+
+### Domain docs
+
+单上下文布局：一个 `CONTEXT.md` + `docs/adr/` 位于仓库根目录。详见 `docs/agents/domain.md`。
