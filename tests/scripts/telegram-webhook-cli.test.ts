@@ -17,7 +17,6 @@ async function localEnv() {
   await writeFile(path, [
     'TELEGRAM_BOT_TOKEN=123:super-secret-token',
     'TELEGRAM_WEBHOOK_SECRET=webhook-secret',
-    'NOW_WEBHOOK_URL=https://blog.example/api/telegram/webhook',
   ].join('\n'));
   cleanups.push(() => rm(directory, { recursive: true, force: true }));
   return path;
@@ -34,7 +33,7 @@ describe('Telegram webhook CLI', () => {
     const [url, request] = fetch.mock.calls[0];
     expect(url).toBe('https://api.telegram.org/bot123%3Asuper-secret-token/setWebhook');
     expect(JSON.parse(String(request?.body))).toEqual({
-      url: 'https://blog.example/api/telegram/webhook',
+      url: 'https://blog.kuaikuaitz.top/api/telegram/webhook',
       secret_token: 'webhook-secret',
       allowed_updates: ['channel_post', 'edited_channel_post'],
     });

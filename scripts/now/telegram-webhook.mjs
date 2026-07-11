@@ -3,20 +3,21 @@ import { pathToFileURL } from 'node:url';
 import { loadLocalEnv, redact, requireEnv } from './env.mjs';
 
 const endpoints = { set: 'setWebhook', info: 'getWebhookInfo', delete: 'deleteWebhook' };
+const webhookUrl = 'https://blog.kuaikuaitz.top/api/telegram/webhook';
 
 export async function runWebhookCommand(command, options = {}) {
   if (!(command in endpoints)) throw new Error('命令必须是 set、info 或 delete');
   const envFile = options.envFile ?? '.env.production.local';
   const values = await loadLocalEnv(envFile);
   const env = requireEnv(values, command === 'set'
-    ? ['TELEGRAM_BOT_TOKEN', 'TELEGRAM_WEBHOOK_SECRET', 'NOW_WEBHOOK_URL']
+    ? ['TELEGRAM_BOT_TOKEN', 'TELEGRAM_WEBHOOK_SECRET']
     : ['TELEGRAM_BOT_TOKEN']);
   const rawSecrets = [values.TELEGRAM_BOT_TOKEN, values.TELEGRAM_WEBHOOK_SECRET, values.TURSO_AUTH_TOKEN];
   const secrets = rawSecrets.flatMap((value) => value ? [value, encodeURIComponent(value)] : []);
   const fetchFn = options.fetch ?? fetch;
   const log = options.log ?? console.log;
   const body = command === 'set' ? {
-    url: env.NOW_WEBHOOK_URL,
+    url: webhookUrl,
     secret_token: env.TELEGRAM_WEBHOOK_SECRET,
     allowed_updates: ['channel_post', 'edited_channel_post'],
   } : command === 'delete' ? { drop_pending_updates: false } : undefined;
