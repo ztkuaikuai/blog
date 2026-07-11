@@ -37,6 +37,16 @@ export default defineConfig({
 		remarkPlugins: [remarkReadingTime]
 	},
 	integrations: [react(), sitemap()],
+	vite: {
+		server: {
+			proxy: {
+				'/api/now': {
+					target: 'https://blog.kuaikuaitz.top',
+					changeOrigin: true,
+				},
+			},
+		},
+	},
 	output: 'static',
 	adapter: vercel()
 });

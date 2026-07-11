@@ -71,21 +71,49 @@ import Base from '@/layouts/Base.astro';
     return fragment;
   }
 
+  function lucideChevron(direction: 'left' | 'right'): SVGSVGElement {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('fill', 'none');
+    svg.setAttribute('stroke', 'currentColor');
+    svg.setAttribute('stroke-width', '2');
+    svg.setAttribute('stroke-linecap', 'round');
+    svg.setAttribute('stroke-linejoin', 'round');
+    svg.setAttribute('class', 'h-5 w-5');
+    svg.setAttribute('aria-hidden', 'true');
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', direction === 'left' ? 'm15 18-6-6 6-6' : 'm9 18 6-6-6-6');
+    svg.append(path);
+    return svg;
+  }
+
+  function galleryButton(direction: 'left' | 'right'): HTMLButtonElement {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `${direction === 'left' ? 'left-2' : 'right-2'} pointer-events-auto absolute top-1/2 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-stone-700 shadow-sm ring-1 ring-stone-200 transition hover:bg-white hover:text-orange-600 dark:bg-stone-900/90 dark:text-stone-200 dark:ring-stone-700 dark:hover:bg-stone-900`;
+    button.setAttribute('aria-label', direction === 'left' ? '切换上一张图片' : '切换下一张图片');
+    button.append(lucideChevron(direction));
+    return button;
+  }
+
   function card(message: NowMessage): HTMLElement {
     const row = document.createElement('article');
-    row.className = 'flex gap-4 border-b border-stone-200 py-5 dark:border-stone-800';
+    row.className = 'border-b border-stone-200 py-5 dark:border-stone-800';
     const date = new Date(message.timestamp);
     const dateColumn = document.createElement('time');
-    dateColumn.className = 'w-20 shrink-0 text-right font-mono text-xs text-stone-400';
+    dateColumn.className = 'mb-2 block font-mono text-[11px] text-stone-400 dark:text-stone-500';
     dateColumn.dateTime = message.timestamp;
-    dateColumn.textContent = date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', year: 'numeric' });
+    dateColumn.textContent = `${date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', year: 'numeric' })} ${date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}`;
     const content = document.createElement('div');
-    content.className = 'min-w-0 flex-1';
+    content.className = 'min-w-0';
     const text = document.createElement('p');
     text.className = 'whitespace-pre-wrap break-words text-sm leading-relaxed text-stone-700 dark:text-stone-300';
     text.append(linkedText(message));
+    const galleryWrap = document.createElement('div');
+    galleryWrap.className = 'group relative mt-3 min-w-0';
     const gallery = document.createElement('div');
-    gallery.className = 'mt-3 flex gap-2 overflow-x-auto pb-1';
+    gallery.className = 'now-gallery flex snap-x gap-2 overflow-x-auto scroll-smooth';
     gallery.dataset.nowGallery = '';
     for (const image of message.images) {
       const element = document.createElement('img');
@@ -94,9 +122,57 @@ import Base from '@/layouts/Base.astro';
       element.loading = 'lazy';
       element.width = image.width;
       element.height = image.height;
-      element.className = 'h-40 w-auto max-w-[80%] shrink-0 cursor-zoom-in rounded-lg object-cover';
+      element.className = 'h-40 w-auto max-w-[80%] shrink-0 snap-start cursor-zoom-in rounded-lg object-cover';
       gallery.append(element);
     }
+    const previousButton = galleryButton('left');
+    const nextButton = galleryButton('right');
+    previousButton.onclick = () => {
+      const previousImages = Array.from(gallery.children).filter((image) => {
+        return image instanceof HTMLElement && image.offsetLeft < gallery.scrollLeft - 8;
+      });
+      const previousImage = previousImages.at(-1);
+      const previousScrollLeft = previousImage instanceof HTMLElement
+        ? previousImage.offsetLeft
+        : Math.max(gallery.scrollLeft - gallery.clientWidth * 0.75, 0);
+      gallery.scrollTo({
+        left: Math.max(previousScrollLeft, 0),
+        behavior: 'smooth',
+      });
+    };
+    nextButton.onclick = () => {
+      const maxScrollLeft = gallery.scrollWidth - gallery.clientWidth;
+      const nextImage = Array.from(gallery.children).find((image) => {
+        return image instanceof HTMLElement && image.offsetLeft > gallery.scrollLeft + 8;
+      });
+      const nextScrollLeft = nextImage instanceof HTMLElement
+        ? nextImage.offsetLeft
+        : Math.min(gallery.scrollLeft + gallery.clientWidth * 0.75, maxScrollLeft);
+      gallery.scrollTo({
+        left: Math.min(nextScrollLeft, maxScrollLeft),
+        behavior: 'smooth',
+      });
+    };
+    const syncGalleryButtons = () => {
+      const maxScrollLeft = gallery.scrollWidth - gallery.clientWidth;
+      const isOverflowing = maxScrollLeft > 1;
+      const isAtStart = gallery.scrollLeft <= 1;
+      const isAtEnd = gallery.scrollLeft >= maxScrollLeft - 1;
+      const showPrevious = isOverflowing && !isAtStart;
+      const showNext = isOverflowing && !isAtEnd;
+
+      previousButton.classList.toggle('hidden', !showPrevious);
+      previousButton.classList.toggle('flex', showPrevious);
+      nextButton.classList.toggle('hidden', !showNext);
+      nextButton.classList.toggle('flex', showNext);
+    };
+    requestAnimationFrame(syncGalleryButtons);
+    gallery.addEventListener('scroll', syncGalleryButtons, { passive: true });
+    window.addEventListener('resize', syncGalleryButtons);
+    gallery.querySelectorAll('img').forEach((image) => {
+      image.addEventListener('load', syncGalleryButtons, { once: true });
+    });
+    galleryWrap.append(gallery, previousButton, nextButton);
     const source = document.createElement('a');
     source.href = message.link;
     source.target = '_blank';
@@ -104,7 +180,7 @@ import Base from '@/layouts/Base.astro';
     source.className = 'mt-2 inline-block text-[11px] text-stone-400 hover:text-orange-600';
     source.textContent = 'Telegram →';
     content.append(text);
-    if (message.images.length) content.append(gallery);
+    if (message.images.length) content.append(galleryWrap);
     content.append(source);
     row.append(dateColumn, content);
     return row;
@@ -152,3 +228,14 @@ import Base from '@/layouts/Base.astro';
     if (entries[0]?.isIntersecting) void feed.loadMore();
   }, { rootMargin: '200px' }).observe(document.querySelector('#now-sentinel')!);
 </script>
+
+<style is:global>
+  .now-gallery {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .now-gallery::-webkit-scrollbar {
+    display: none;
+  }
+</style>

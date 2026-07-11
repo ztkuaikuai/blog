@@ -69,14 +69,6 @@ describe('GET /api/now.json', () => {
     expect((await get(`?cursor=${encodeURIComponent(`${first.nextCursor}x`)}`)).status).toBe(400);
   });
 
-  it('根据最新持久记录判断 48 小时更新', async () => {
-    const now = Math.floor(Date.now() / 1000);
-    await publish(1, now - 49 * 60 * 60);
-    expect((await (await get('?limit=1')).json()).hasRecentUpdate).toBe(false);
-    await publish(2, now - 60 * 60);
-    expect((await (await get('?limit=1')).json()).hasRecentUpdate).toBe(true);
-  });
-
   it('数据库不可用时返回 503', async () => {
     client.close();
     expect((await get()).status).toBe(503);

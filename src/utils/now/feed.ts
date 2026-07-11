@@ -12,7 +12,6 @@ export interface NowMessage {
 export interface NowPage {
   messages: NowMessage[];
   nextCursor: string | null;
-  hasRecentUpdate: boolean;
 }
 
 export interface NowFeedView {

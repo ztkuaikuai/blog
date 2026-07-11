@@ -1,13 +1,12 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import type { APIRoute } from 'astro';
-import { latestPublishedAt, listPublishedNowEntries, type NowPageCursor } from '@/utils/now/database';
+import { listPublishedNowEntries, type NowPageCursor } from '@/utils/now/database';
 import { normalizeNowText } from '@/utils/now/text';
 import { serverEnv } from '@/utils/server-env';
 
 export const prerender = false;
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 50;
-const RECENT_SECONDS = 48 * 60 * 60;
 
 function cursorSecret(): string {
   const secret = serverEnv('NOW_CURSOR_SECRET') || serverEnv('TELEGRAM_WEBHOOK_SECRET');
@@ -50,10 +49,7 @@ export const GET: APIRoute = async ({ request }) => {
   }
 
   try {
-    const [{ entries, hasMore }, latest] = await Promise.all([
-      listPublishedNowEntries(limit, cursor),
-      latestPublishedAt(),
-    ]);
+    const { entries, hasMore } = await listPublishedNowEntries(limit, cursor);
     const messages = entries.map((entry) => ({
       id: String(entry.telegramMessageId),
       text: entry.displayText,
@@ -66,11 +62,10 @@ export const GET: APIRoute = async ({ request }) => {
     return Response.json({
       messages,
       nextCursor: hasMore && last ? encodeCursor({ publishedAt: last.publishedAt, id: last.id }) : null,
-      hasRecentUpdate: latest !== undefined && latest >= Math.floor(Date.now() / 1000) - RECENT_SECONDS,
     });
   } catch {
     return Response.json(
-      { error: '暂时无法获取数据，请稍后重试', messages: [], nextCursor: null, hasRecentUpdate: false },
+      { error: '暂时无法获取数据，请稍后重试', messages: [], nextCursor: null },
       { status: 503 },
     );
   }

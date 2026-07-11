@@ -14,7 +14,7 @@ describe('NowFeed', () => {
   it('首次加载失败后可以重试', async () => {
     const load = vi.fn<() => Promise<NowPage>>()
       .mockRejectedValueOnce(new Error('offline'))
-      .mockResolvedValueOnce({ messages: [message('1')], nextCursor: null, hasRecentUpdate: true });
+      .mockResolvedValueOnce({ messages: [message('1')], nextCursor: null });
     const target = view();
     const feed = new NowFeed(load, target);
 
@@ -26,9 +26,9 @@ describe('NowFeed', () => {
 
   it('加载更多失败保留已有内容并允许重试', async () => {
     const load = vi.fn<(cursor: string | null) => Promise<NowPage>>()
-      .mockResolvedValueOnce({ messages: [message('1')], nextCursor: 'next', hasRecentUpdate: true })
+      .mockResolvedValueOnce({ messages: [message('1')], nextCursor: 'next' })
       .mockRejectedValueOnce(new Error('offline'))
-      .mockResolvedValueOnce({ messages: [message('2')], nextCursor: null, hasRecentUpdate: true });
+      .mockResolvedValueOnce({ messages: [message('2')], nextCursor: null });
     const target = view();
     const feed = new NowFeed(load, target);
 

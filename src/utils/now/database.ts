@@ -242,10 +242,3 @@ export async function findPublishedImage(imageId: string): Promise<{ fileId: str
   });
   return result.rows[0] ? { fileId: String(result.rows[0].file_id) } : undefined;
 }
-
-export async function latestPublishedAt(): Promise<number | undefined> {
-  const result = await getNowDatabase().execute(
-    "SELECT published_at FROM now_entries WHERE status = 'published' ORDER BY published_at DESC, id DESC LIMIT 1",
-  );
-  return result.rows[0] ? Number(result.rows[0].published_at) : undefined;
-}
