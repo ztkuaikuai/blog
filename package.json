@@ -11,6 +11,9 @@
 		"build": "astro check && astro build",
 		"preview": "astro preview",
 		"astro": "astro",
+		"now:migrate": "node scripts/now/migrate.mjs",
+		"now:webhook": "node scripts/now/telegram-webhook.mjs",
+		"now:security-check": "node scripts/now/security-check.mjs",
 		"test": "vitest run",
 		"test:watch": "vitest"
 	},
