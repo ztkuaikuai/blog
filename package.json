@@ -20,6 +20,7 @@
 		"@astrojs/rss": "^4.0.19",
 		"@astrojs/sitemap": "^3.7.3",
 		"@astrojs/vercel": "^10.0.8",
+		"@libsql/client": "^0.17.4",
 		"@types/react": "^18.3.31",
 		"@types/react-dom": "^18.3.7",
 		"@vercel/analytics": "^1.6.1",

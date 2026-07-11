@@ -1,401 +1,129 @@
 ---
-// ============================================================
-// /now 页面（"此刻"）
-// 从 Telegram 频道拉取带 #now 标签的消息，倒叙时间线展示
-// 无限滚动加载，Viewer.js 图片预览
-// ============================================================
 import Base from '@/layouts/Base.astro';
-
-const PAGE_TITLE = '此刻';
-const PAGE_DESCRIPTION = '记录我此刻正在做什么、想什么、关注什么';
 ---
 
-<Base
-  head={{
-    title: PAGE_TITLE,
-    description: PAGE_DESCRIPTION,
-  }}
->
-  <div class="mx-auto w-full max-w-screen-lg px-4 py-6">
-    <!-- 页面标题 -->
-    <div class="flex items-center justify-center">
-      <p class="text-4xl font-bold">此刻</p>
-    </div>
-
-    <!-- 静态回退：当 JS 未加载时显示提示 -->
-    <noscript>
-      <div class="mt-32 flex flex-col items-center justify-center text-center">
-        <p class="text-sm text-stone-400 dark:text-stone-500">需要启用 JavaScript 来加载内容</p>
-      </div>
-    </noscript>
-
-    <!-- 消息容器 -->
+<Base head={{ title: '此刻', description: '记录我此刻正在做什么、想什么、关注什么' }}>
+  <main class="mx-auto w-full max-w-screen-lg px-4 py-6">
+    <h1 class="text-center text-4xl font-bold">此刻</h1>
+    <noscript><p class="mt-32 text-center text-sm text-stone-400">需要启用 JavaScript 来加载内容</p></noscript>
     <div id="now-container" class="mt-8"></div>
-
-    <!-- 加载指示器 -->
-    <div id="now-loader" class="mt-8 flex justify-center" style="display:none">
-      <span class="text-sm text-stone-400 dark:text-stone-500">加载中...</span>
+    <p id="now-loader" class="mt-8 hidden text-center text-sm text-stone-400">加载中...</p>
+    <div id="now-initial-error" class="mt-32 hidden text-center">
+      <p class="text-sm text-stone-400">暂时无法获取数据，请稍后重试</p>
+      <button class="mt-3 rounded-lg bg-stone-200 px-4 py-2 text-sm dark:bg-stone-800">重试</button>
     </div>
-
-    <!-- 已加载全部提示 -->
-    <div id="now-end" class="mt-8 flex justify-center" style="display:none">
-      <span class="text-xs text-stone-300 dark:text-stone-600">— 已加载全部 —</span>
+    <div id="now-more-error" class="mt-8 hidden text-center">
+      <p class="text-sm text-stone-400">加载更多失败</p>
+      <button class="mt-2 text-sm text-orange-600 hover:underline">重试</button>
     </div>
-
-    <!-- stale 数据提示 -->
-    <div id="now-stale" class="mt-4 flex justify-center" style="display:none">
-      <span class="rounded-full bg-amber-100 px-3 py-1 text-xs text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
-        数据可能不是最新的
-      </span>
-    </div>
-
-    <!-- 错误提示 -->
-    <div id="now-error" class="mt-32 flex flex-col items-center justify-center text-center" style="display:none">
-      <p class="text-sm text-stone-400 dark:text-stone-500">暂时无法获取数据，请稍后重试</p>
-      <button id="now-retry-btn" class="mt-3 rounded-lg bg-stone-200 px-4 py-2 text-sm text-stone-600 transition-colors hover:bg-stone-300 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700">
-        重试
-      </button>
-    </div>
-
-    <!-- 空状态 -->
-    <div id="now-empty" class="mt-32 flex flex-col items-center justify-center text-center" style="display:none">
-      <p class="text-sm text-stone-400 dark:text-stone-500">暂无记录</p>
-    </div>
-  </div>
+    <p id="now-empty" class="mt-32 hidden text-center text-sm text-stone-400">暂无记录</p>
+    <p id="now-end" class="mt-8 hidden text-center text-xs text-stone-300 dark:text-stone-600">— 已加载全部 —</p>
+    <div id="now-sentinel" class="h-1"></div>
+  </main>
 </Base>
 
-<!-- Viewer.js -->
-<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/viewerjs/1.11.6/viewer.min.css">
-<script is:inline src="https://cdn.bootcdn.net/ajax/libs/viewerjs/1.11.6/viewer.min.js" defer></script>
-
 <script>
-  // ============================================================
-  // /now 页面客户端逻辑
-  // ============================================================
+  import { NowFeed, type NowMessage, type NowPage } from '@/utils/now/feed';
 
-  interface NowMessage {
-    id: string;
-    text: string;
-    images: string[];
-    timestamp: string;
-    link: string;
+  const container = document.querySelector<HTMLElement>('#now-container')!;
+  const loader = document.querySelector<HTMLElement>('#now-loader')!;
+  const initialError = document.querySelector<HTMLElement>('#now-initial-error')!;
+  const moreError = document.querySelector<HTMLElement>('#now-more-error')!;
+  const empty = document.querySelector<HTMLElement>('#now-empty')!;
+  const end = document.querySelector<HTMLElement>('#now-end')!;
+  const hide = (element: HTMLElement) => element.classList.add('hidden');
+  const show = (element: HTMLElement) => element.classList.remove('hidden');
+
+  function safeHttpUrl(value: string | undefined): string | undefined {
+    if (!value) return undefined;
+    try {
+      const url = new URL(value);
+      return url.protocol === 'http:' || url.protocol === 'https:' ? url.href : undefined;
+    } catch { return undefined; }
   }
 
-  interface ApiResponse {
-    messages: NowMessage[];
-    hasRecentUpdate: boolean;
-    stale?: boolean;
-    error?: string;
-  }
-
-  const PAGE_SIZE = 20;
-  let currentOffset = 0;
-  let hasMore = true;
-  let isLoading = false;
-
-  // ---- DOM 元素 ----
-  const container = document.getElementById('now-container')!;
-  const loader = document.getElementById('now-loader')!;
-  const endEl = document.getElementById('now-end')!;
-  const staleEl = document.getElementById('now-stale')!;
-  const errorEl = document.getElementById('now-error')!;
-  const emptyEl = document.getElementById('now-empty')!;
-  const retryBtn = document.getElementById('now-retry-btn')!;
-
-  // ---- 工具函数 ----
-
-  function relativeTime(dateStr: string): string {
-    const now = Date.now();
-    const date = new Date(dateStr).getTime();
-    const diff = now - date;
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
-
-    if (minutes < 1) return '刚刚';
-    if (minutes < 60) return `${minutes} 分钟前`;
-    if (hours < 24) return `${hours} 小时前`;
-    if (days < 7) return `${days} 天前`;
-    if (days < 30) return `${Math.floor(days / 7)} 周前`;
-    return new Date(dateStr).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
-  }
-
-  function formatDate(dateStr: string): { monthDay: string; year: string } {
-    const d = new Date(dateStr);
-    return {
-      monthDay: d.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' }),
-      year: String(d.getFullYear()),
-    };
-  }
-
-  // ---- 渲染 ----
-
-  function createMessageCard(msg: NowMessage, isLatest: boolean): HTMLElement {
-    const { monthDay, year } = formatDate(msg.timestamp);
-
-    const wrapper = document.createElement('div');
-    wrapper.className = `flex gap-4 py-5 border-b border-stone-200 dark:border-stone-800`;
-
-    // 左侧：日期
-    const dateCol = document.createElement('div');
-    dateCol.className = 'w-20 shrink-0 text-right';
-    dateCol.innerHTML = `
-      <p class="text-xs text-stone-400 dark:text-stone-500 font-mono leading-tight">${monthDay}</p>
-      <p class="text-[10px] text-stone-400/70 dark:text-stone-500/70 font-mono leading-tight mt-0.5">${year}</p>
-    `;
-
-    // 右侧：内容
-    const contentCol = document.createElement('div');
-    contentCol.className = 'min-w-0 flex-1';
-
-    // 文字 + 最新标记
-    const textHtml = escapeHtml(msg.text);
-    const dotHtml = isLatest
-      ? '<span class="ml-1.5 inline-block h-1.5 w-1.5 rounded-full bg-orange-500 align-middle"></span>'
-      : '';
-
-    // 图片
-    let imagesHtml = '';
-    if (msg.images.length > 0) {
-      const imgTags = msg.images
-        .map((src) => `<img src="${escapeHtml(src)}" alt="" class="h-16 w-16 shrink-0 cursor-pointer rounded-md object-cover" loading="lazy" />`)
-        .join('');
-      imagesHtml = `
-        <div class="now-gallery mt-2">
-          <div class="flex gap-1.5 overflow-x-auto">${imgTags}</div>
-        </div>
-      `;
-    }
-
-    contentCol.innerHTML = `
-      <p class="text-sm leading-relaxed text-stone-700 dark:text-stone-300">
-        ${textHtml}${dotHtml}
-      </p>
-      ${imagesHtml}
-      <div class="mt-1.5 flex items-center gap-3 text-[11px] text-stone-400 dark:text-stone-500">
-        <span>${relativeTime(msg.timestamp)}</span>
-        <a href="${escapeHtml(msg.link)}" target="_blank" rel="noopener noreferrer" class="hover:text-orange-600 transition-colors">
-          Telegram →
-        </a>
-      </div>
-    `;
-
-    wrapper.appendChild(dateCol);
-    wrapper.appendChild(contentCol);
-    return wrapper;
-  }
-
-  function escapeHtml(text: string): string {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
-
-  // ---- Viewer.js 初始化 ----
-
-  function initViewer() {
-    // 销毁旧实例
-    document.querySelectorAll('.now-gallery').forEach((gallery) => {
-      const imgs = gallery.querySelectorAll('img');
-      imgs.forEach((img) => {
-        (img as any)._viewer?.destroy();
-      });
-    });
-
-    // 为每个画廊初始化
-    document.querySelectorAll('.now-gallery').forEach((gallery) => {
-      const imgs = gallery.querySelectorAll('img');
-      if (imgs.length === 0) return;
-
-      if (imgs.length === 1) {
-        new (window as any).Viewer(imgs[0], {
-          button: false,
-          navbar: false,
-          title: false,
-          toolbar: {
-            zoomIn: 4, zoomOut: 4, oneToOne: 4, reset: 0,
-            prev: 0, play: 0, next: 0, rotateLeft: 4, rotateRight: 4,
-            flipHorizontal: 0, flipVertical: 0,
-          },
-        });
-      } else {
-        new (window as any).Viewer(gallery, {
-          button: false,
-          navbar: false,
-          title: false,
-          toolbar: {
-            zoomIn: 4, zoomOut: 4, oneToOne: 4, reset: 0,
-            prev: 0, play: 0, next: 0, rotateLeft: 4, rotateRight: 4,
-            flipHorizontal: 0, flipVertical: 0,
-          },
-        });
-      }
-    });
-  }
-
-  // ---- 数据加载 ----
-
-  async function fetchMessages(offset: number): Promise<ApiResponse> {
-    const params = new URLSearchParams({ limit: String(PAGE_SIZE), offset: String(offset) });
-    const res = await fetch(`/api/now.json?${params}`);
-    if (!res.ok) {
-      throw new Error(`API returned ${res.status}`);
-    }
-    return res.json();
-  }
-
-  function appendMessages(messages: NowMessage[], isFirstPage: boolean) {
+  function linkedText(message: NowMessage): DocumentFragment {
     const fragment = document.createDocumentFragment();
-
-    messages.forEach((msg, i) => {
-      const isLatest = isFirstPage && i === 0;
-      fragment.appendChild(createMessageCard(msg, isLatest));
-    });
-
-    container.appendChild(fragment);
-
-    // 重新初始化 Viewer.js
-    initViewer();
-  }
-
-  async function loadFirstPage() {
-    isLoading = true;
-    try {
-      const data = await fetchMessages(0);
-      currentOffset = data.messages.length;
-      hasMore = data.messages.length >= PAGE_SIZE;
-
-      if (data.error) {
-        showError();
-        return;
-      }
-
-      if (data.messages.length === 0) {
-        showEmpty();
-        return;
-      }
-
-      if (data.stale) {
-        staleEl.style.display = '';
-      }
-
-      appendMessages(data.messages, true);
-
-      // 通知 Navbar 更新状态
-      window.dispatchEvent(new CustomEvent('now-page-loaded', {
-        detail: { hasRecentUpdate: data.hasRecentUpdate },
-      }));
-
-      if (!hasMore) {
-        endEl.style.display = '';
-      }
-    } catch {
-      showError();
-    } finally {
-      isLoading = false;
+    let position = 0;
+    const entities = [...message.entities]
+      .filter((entity) => entity.type === 'url' || entity.type === 'text_link')
+      .sort((left, right) => left.offset - right.offset);
+    for (const entity of entities) {
+      if (entity.offset < position || entity.offset + entity.length > message.text.length) continue;
+      fragment.append(document.createTextNode(message.text.slice(position, entity.offset)));
+      const label = message.text.slice(entity.offset, entity.offset + entity.length);
+      const href = safeHttpUrl(entity.type === 'url' ? label : entity.url);
+      if (href) {
+        const anchor = document.createElement('a');
+        anchor.href = href;
+        anchor.target = '_blank';
+        anchor.rel = 'noopener noreferrer';
+        anchor.className = 'text-orange-600 hover:underline';
+        anchor.textContent = label;
+        fragment.append(anchor);
+      } else fragment.append(document.createTextNode(label));
+      position = entity.offset + entity.length;
     }
+    fragment.append(document.createTextNode(message.text.slice(position)));
+    return fragment;
   }
 
-  async function loadNextPage() {
-    if (isLoading || !hasMore) return;
-    isLoading = true;
-    loader.style.display = '';
-
-    try {
-      const data = await fetchMessages(currentOffset);
-      if (data.messages.length === 0) {
-        hasMore = false;
-        endEl.style.display = '';
-        loader.style.display = 'none';
-        return;
-      }
-
-      currentOffset += data.messages.length;
-      hasMore = data.messages.length >= PAGE_SIZE;
-
-      appendMessages(data.messages, false);
-
-      if (!hasMore) {
-        endEl.style.display = '';
-      }
-    } catch {
-      // 加载更多失败：静默处理，保留已显示内容
-      hasMore = false;
-      endEl.style.display = '';
-    } finally {
-      isLoading = false;
-      loader.style.display = 'none';
-    }
+  function card(message: NowMessage): HTMLElement {
+    const row = document.createElement('article');
+    row.className = 'flex gap-4 border-b border-stone-200 py-5 dark:border-stone-800';
+    const date = new Date(message.timestamp);
+    const dateColumn = document.createElement('time');
+    dateColumn.className = 'w-20 shrink-0 text-right font-mono text-xs text-stone-400';
+    dateColumn.dateTime = message.timestamp;
+    dateColumn.textContent = date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', year: 'numeric' });
+    const content = document.createElement('div');
+    content.className = 'min-w-0 flex-1';
+    const text = document.createElement('p');
+    text.className = 'whitespace-pre-wrap break-words text-sm leading-relaxed text-stone-700 dark:text-stone-300';
+    text.append(linkedText(message));
+    const source = document.createElement('a');
+    source.href = message.link;
+    source.target = '_blank';
+    source.rel = 'noopener noreferrer';
+    source.className = 'mt-2 inline-block text-[11px] text-stone-400 hover:text-orange-600';
+    source.textContent = 'Telegram →';
+    content.append(text, source);
+    row.append(dateColumn, content);
+    return row;
   }
 
-  // ---- 状态切换 ----
-
-  function hideAll() {
-    loader.style.display = 'none';
-    endEl.style.display = 'none';
-    staleEl.style.display = 'none';
-    errorEl.style.display = 'none';
-    emptyEl.style.display = 'none';
+  function add(messages: NowMessage[]) {
+    const fragment = document.createDocumentFragment();
+    messages.forEach((message) => fragment.append(card(message)));
+    container.append(fragment);
   }
 
-  function showError() {
-    hideAll();
-    if (container.children.length === 0) {
-      errorEl.style.display = '';
-    }
+  async function fetchPage(cursor: string | null): Promise<NowPage> {
+    const params = new URLSearchParams({ limit: '20' });
+    if (cursor) params.set('cursor', cursor);
+    const response = await fetch(`/api/now.json?${params}`);
+    if (!response.ok) throw new Error(`Now API returned ${response.status}`);
+    return response.json();
   }
 
-  function resetState() {
-    currentOffset = 0;
-    hasMore = true;
-    isLoading = false;
-    container.innerHTML = '';
-    hideAll();
-  }
+  const feed = new NowFeed(fetchPage, {
+    replace(messages) { container.replaceChildren(); hide(initialError); hide(moreError); add(messages); },
+    append(messages) { hide(moreError); add(messages); },
+    showEmpty() { show(empty); },
+    showEnd() { show(end); },
+    showInitialError(retry) {
+      show(initialError);
+      initialError.querySelector('button')!.onclick = () => void retry();
+    },
+    showMoreError(retry) {
+      show(moreError);
+      moreError.querySelector('button')!.onclick = () => void retry();
+    },
+    setLoading(loading) { loader.classList.toggle('hidden', !loading); },
+  });
 
-  function showEmpty() {
-    hideAll();
-    emptyEl.style.display = '';
-  }
-
-  // ---- 无限滚动 ----
-
-  function setupInfiniteScroll() {
-    const sentinel = document.createElement('div');
-    sentinel.id = 'scroll-sentinel';
-    sentinel.className = 'h-1';
-    container.parentElement?.appendChild(sentinel);
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoading) {
-          loadNextPage();
-        }
-      },
-      { rootMargin: '200px' }
-    );
-
-    observer.observe(sentinel);
-  }
-
-  // ---- 启动 ----
-
-  function init() {
-    hideAll();
-    setupInfiniteScroll();
-    loadFirstPage();
-
-    // 重试按钮
-    retryBtn.addEventListener('click', () => {
-      resetState();
-      loadFirstPage();
-    });
-  }
-
-  // 等待 Viewer.js 加载完成
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+  void feed.loadFirst();
+  new IntersectionObserver((entries) => {
+    if (entries[0]?.isIntersecting) void feed.loadMore();
+  }, { rootMargin: '200px' }).observe(document.querySelector('#now-sentinel')!);
 </script>
