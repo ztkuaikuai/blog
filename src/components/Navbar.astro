@@ -13,8 +13,8 @@ import Section from './Section.astro';
 			<nav>
 				<ul class="flex-row flex">
 					<li><a href="/posts" class="mr-3 hover:text-orange-600">文章</a></li>
+					<li class="relative"><a href="/now" class="mr-3 hover:text-orange-600">此刻<span id="now-dot" class="absolute -right-0.5 -top-0.5 hidden h-2 w-2 rounded-full bg-orange-500"></span></a></li>
 					<li><a href="/tags" class="mr-3 hover:text-orange-600">标签</a></li>
-					<li class="relative"><a href="/now" class="mr-3 hover:text-orange-600">此刻<span id="now-dot" class="absolute -right-0.5 -top-0.5 hidden h-1.5 w-1.5 rounded-full bg-orange-500"></span></a></li>
 					<li><a href="/friends" class="mr-3 hover:text-orange-600">友链</a></li>
 					<li><a href="/about" class="hover:text-orange-600">关于我</a></li>
 				</ul>
@@ -96,9 +96,25 @@ import Section from './Section.astro';
 		// /now 页面本身由页面数据通知，此处仅处理非 /now 页面
 		async function checkNowUpdate() {
 			try {
+				// 检查 sessionStorage 缓存，同会话内不重复请求
+				const cached = sessionStorage.getItem('now-dot-status');
+				if (cached) {
+					const { hasRecentUpdate } = JSON.parse(cached);
+					if (hasRecentUpdate) {
+						nowDot?.classList.remove('hidden');
+					}
+					return;
+				}
+
 				const res = await fetch('/api/now.json?limit=1');
 				if (!res.ok) return;
 				const data = await res.json();
+
+				// 缓存到 sessionStorage
+				sessionStorage.setItem('now-dot-status', JSON.stringify({
+					hasRecentUpdate: data.hasRecentUpdate,
+				}));
+
 				if (data.hasRecentUpdate) {
 					nowDot?.classList.remove('hidden');
 				}
@@ -115,10 +131,12 @@ import Section from './Section.astro';
 		}
 	}
 
-	// 监听 /now 页面发出的自定义事件（/now 页面加载完后会触发）
-	window.addEventListener('now-page-loaded', ((e: CustomEvent) => {
-		if (nowDot && e.detail?.hasRecentUpdate) {
-			nowDot.classList.remove('hidden');
-		}
-	}) as EventListener);
+	// 监听 /now 页面发出的自定义事件（仅在非 /now 页面注册）
+	if (nowDot && !isNowPage) {
+		window.addEventListener('now-page-loaded', ((e: CustomEvent) => {
+			if (e.detail?.hasRecentUpdate) {
+				nowDot.classList.remove('hidden');
+			}
+		}) as EventListener);
+	}
 </script>
