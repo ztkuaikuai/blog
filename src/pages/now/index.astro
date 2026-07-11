@@ -52,6 +52,9 @@ const PAGE_DESCRIPTION = '记录我此刻正在做什么、想什么、关注什
     <!-- 错误提示 -->
     <div id="now-error" class="mt-32 flex flex-col items-center justify-center text-center" style="display:none">
       <p class="text-sm text-stone-400 dark:text-stone-500">暂时无法获取数据，请稍后重试</p>
+      <button id="now-retry-btn" class="mt-3 rounded-lg bg-stone-200 px-4 py-2 text-sm text-stone-600 transition-colors hover:bg-stone-300 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700">
+        重试
+      </button>
     </div>
 
     <!-- 空状态 -->
@@ -97,6 +100,7 @@ const PAGE_DESCRIPTION = '记录我此刻正在做什么、想什么、关注什
   const staleEl = document.getElementById('now-stale')!;
   const errorEl = document.getElementById('now-error')!;
   const emptyEl = document.getElementById('now-empty')!;
+  const retryBtn = document.getElementById('now-retry-btn')!;
 
   // ---- 工具函数 ----
 
@@ -341,6 +345,14 @@ const PAGE_DESCRIPTION = '记录我此刻正在做什么、想什么、关注什
     }
   }
 
+  function resetState() {
+    currentOffset = 0;
+    hasMore = true;
+    isLoading = false;
+    container.innerHTML = '';
+    hideAll();
+  }
+
   function showEmpty() {
     hideAll();
     emptyEl.style.display = '';
@@ -372,6 +384,12 @@ const PAGE_DESCRIPTION = '记录我此刻正在做什么、想什么、关注什
     hideAll();
     setupInfiniteScroll();
     loadFirstPage();
+
+    // 重试按钮
+    retryBtn.addEventListener('click', () => {
+      resetState();
+      loadFirstPage();
+    });
   }
 
   // 等待 Viewer.js 加载完成

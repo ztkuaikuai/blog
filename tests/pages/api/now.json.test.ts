@@ -61,7 +61,7 @@ describe('/api/now.json', () => {
   // 辅助：重新导入模块并重置
   async function freshModule() {
     vi.resetModules();
-    const mod = await import('../pages/api/now.json.ts');
+    const mod = await import('../../../src/pages/api/now.json.ts');
     mod.__resetForTest();
     return mod;
   }
