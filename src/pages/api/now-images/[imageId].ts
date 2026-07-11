@@ -6,7 +6,19 @@ export const prerender = false;
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 const UPSTREAM_TIMEOUT_MS = 8_000;
 const CACHE_CONTROL = 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400';
-const SAFE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+
+function detectImageType(bytes: Uint8Array): string | undefined {
+  if (bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return 'image/jpeg';
+  if (bytes.length >= 8 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47
+    && bytes[4] === 0x0d && bytes[5] === 0x0a && bytes[6] === 0x1a && bytes[7] === 0x0a) return 'image/png';
+  if (bytes.length >= 12 && new TextDecoder().decode(bytes.subarray(0, 4)) === 'RIFF'
+    && new TextDecoder().decode(bytes.subarray(8, 12)) === 'WEBP') return 'image/webp';
+  if (bytes.length >= 6) {
+    const signature = new TextDecoder().decode(bytes.subarray(0, 6));
+    if (signature === 'GIF87a' || signature === 'GIF89a') return 'image/gif';
+  }
+  return undefined;
+}
 
 async function upstream(url: string): Promise<Response> {
   return fetch(url, { signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS), redirect: 'error' });
@@ -54,14 +66,15 @@ export const GET: APIRoute = async ({ params }) => {
     if (!path || path.includes('..')) return new Response('Upstream error', { status: 502 });
 
     const file = await upstream(`https://api.telegram.org/file/bot${token}/${path}`);
-    const type = file.headers.get('content-type')?.split(';')[0].toLowerCase();
     const declaredSize = Number(file.headers.get('content-length') ?? 0);
-    if (!file.ok || !type || !SAFE_TYPES.has(type) || declaredSize > MAX_IMAGE_BYTES) {
+    if (!file.ok || declaredSize > MAX_IMAGE_BYTES) {
       await file.body?.cancel();
       return new Response('Upstream error', { status: 502 });
     }
     const bytes = await readLimitedBody(file);
     if (!bytes) return new Response('Upstream error', { status: 502 });
+    const type = detectImageType(bytes);
+    if (!type) return new Response('Upstream error', { status: 502 });
     return new Response(bytes, { headers: { 'content-type': type, 'cache-control': CACHE_CONTROL } });
   } catch {
     return new Response('Upstream error', { status: 502 });
