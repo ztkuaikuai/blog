@@ -1,6 +1,6 @@
 import { createHash, timingSafeEqual } from 'node:crypto';
 import type { APIRoute } from 'astro';
-import { deleteTextEntry, publishTextEntry } from '@/utils/now/database';
+import { cleanupPendingAlbums, deleteTextEntry, publishTextEntry, savePhotoFragment } from '@/utils/now/database';
 import { normalizeNowText, type TelegramEntity } from '@/utils/now/text';
 import { serverEnv } from '@/utils/server-env';
 
@@ -13,6 +13,10 @@ interface TelegramPost {
   edit_date?: number;
   text?: string;
   entities?: TelegramEntity[];
+  caption?: string;
+  caption_entities?: TelegramEntity[];
+  media_group_id?: string;
+  photo?: Array<{ file_id: string; width: number; height: number; file_size?: number }>;
   chat: { id: number; username?: string; type: string };
 }
 
@@ -96,8 +100,20 @@ export const POST: APIRoute = async ({ request }) => {
 
   const normalized = post.text ? normalizeNowText(post.text, post.entities) : undefined;
   try {
+    if (post.photo?.length) {
+      const photo = post.photo.at(-1)!;
+      const captionNormalized = post.caption ? normalizeNowText(post.caption, post.caption_entities) : undefined;
+      await savePhotoFragment({
+        channelId: String(post.chat.id), messageId: post.message_id, mediaGroupId: post.media_group_id,
+        rawText: post.caption ?? '', entities: post.caption_entities ?? [], fileId: photo.file_id,
+        width: photo.width, height: photo.height, publishedAt: post.date, updatedAt: post.edit_date ?? post.date,
+        telegramLink: telegramLink(post), normalized: captionNormalized, edited: Boolean(update.edited_channel_post),
+      });
+      return json(200, { ok: true });
+    }
     if (!normalized) {
       if (update.edited_channel_post) await deleteTextEntry(String(post.chat.id), post.message_id);
+      else await cleanupPendingAlbums();
       return json(200, { ok: true });
     }
     await publishTextEntry({

@@ -22,6 +22,9 @@ import Base from '@/layouts/Base.astro';
   </main>
 </Base>
 
+<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/viewerjs/1.11.6/viewer.min.css" />
+<script is:inline src="https://cdn.bootcdn.net/ajax/libs/viewerjs/1.11.6/viewer.min.js" defer></script>
+
 <script>
   import { NowFeed, type NowMessage, type NowPage } from '@/utils/now/feed';
 
@@ -81,13 +84,28 @@ import Base from '@/layouts/Base.astro';
     const text = document.createElement('p');
     text.className = 'whitespace-pre-wrap break-words text-sm leading-relaxed text-stone-700 dark:text-stone-300';
     text.append(linkedText(message));
+    const gallery = document.createElement('div');
+    gallery.className = 'mt-3 flex gap-2 overflow-x-auto pb-1';
+    gallery.dataset.nowGallery = '';
+    for (const image of message.images) {
+      const element = document.createElement('img');
+      element.src = `/api/now-images/${encodeURIComponent(image.id)}`;
+      element.alt = '';
+      element.loading = 'lazy';
+      element.width = image.width;
+      element.height = image.height;
+      element.className = 'h-40 w-auto max-w-[80%] shrink-0 cursor-zoom-in rounded-lg object-cover';
+      gallery.append(element);
+    }
     const source = document.createElement('a');
     source.href = message.link;
     source.target = '_blank';
     source.rel = 'noopener noreferrer';
     source.className = 'mt-2 inline-block text-[11px] text-stone-400 hover:text-orange-600';
     source.textContent = 'Telegram →';
-    content.append(text, source);
+    content.append(text);
+    if (message.images.length) content.append(gallery);
+    content.append(source);
     row.append(dateColumn, content);
     return row;
   }
@@ -96,6 +114,13 @@ import Base from '@/layouts/Base.astro';
     const fragment = document.createDocumentFragment();
     messages.forEach((message) => fragment.append(card(message)));
     container.append(fragment);
+    const Viewer = (window as typeof window & { Viewer?: new (element: Element, options: object) => unknown }).Viewer;
+    if (Viewer) {
+      container.querySelectorAll('[data-now-gallery]:not([data-viewer-ready])').forEach((gallery) => {
+        gallery.setAttribute('data-viewer-ready', '');
+        new Viewer(gallery, { button: false, title: false, navbar: true });
+      });
+    }
   }
 
   async function fetchPage(cursor: string | null): Promise<NowPage> {

@@ -6,6 +6,7 @@ export interface NowMessage {
   entities: TelegramEntity[];
   timestamp: string;
   link: string;
+  images: Array<{ id: string; width: number; height: number }>;
 }
 
 export interface NowPage {

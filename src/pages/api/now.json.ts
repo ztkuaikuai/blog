@@ -60,6 +60,7 @@ export const GET: APIRoute = async ({ request }) => {
       entities: normalizeNowText(entry.rawText, entry.entities)?.displayEntities ?? [],
       timestamp: new Date(entry.publishedAt * 1000).toISOString(),
       link: entry.telegramLink,
+      images: entry.images,
     }));
     const last = entries.at(-1);
     return Response.json({
