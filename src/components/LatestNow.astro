@@ -3,7 +3,7 @@ import Section from './Section.astro'
 ---
 
 <Section>
-	<section data-home-now hidden class="border-t border-stone-300 pb-8 pt-8 dark:border-stone-700">
+	<section data-home-now class="border-t border-stone-300 pb-8 pt-8 dark:border-stone-700">
 		<header class="mb-5 flex items-end justify-between gap-4">
 			<h2 class="text-xl font-bold">此刻</h2>
 			<a href="/now" class="underline decoration-stone-300 underline-offset-4 hover:text-orange-600"
@@ -11,7 +11,27 @@ import Section from './Section.astro'
 			>
 		</header>
 
-		<div data-home-now-list class="home-now-filmstrip flex snap-x gap-3 overflow-x-auto pb-3"></div>
+		<div
+			data-home-now-list
+			aria-busy="true"
+			class="home-now-filmstrip flex snap-x gap-3 overflow-x-auto pb-3"
+		>
+			{
+				[0, 1, 2].map(() => (
+					<div
+						aria-hidden="true"
+						class="relative h-64 w-[78%] shrink-0 animate-pulse snap-start overflow-hidden rounded-2xl bg-stone-200 dark:bg-stone-800 sm:w-[48%] md:w-[calc(33.333%-0.5rem)]"
+					>
+						<div class="flex h-full flex-col p-5">
+							<div class="h-2.5 w-24 rounded bg-stone-300 dark:bg-stone-700" />
+							<div class="mt-6 h-3 w-4/5 rounded bg-stone-300 dark:bg-stone-700" />
+							<div class="mt-3 h-3 w-3/5 rounded bg-stone-300 dark:bg-stone-700" />
+							<div class="mt-auto h-3 w-20 rounded bg-stone-300 dark:bg-stone-700" />
+						</div>
+					</div>
+				))
+			}
+		</div>
 	</section>
 </Section>
 
@@ -129,15 +149,16 @@ import Section from './Section.astro'
 		if (!section || !list) return
 		try {
 			const response = await fetch('/api/now.json?limit=3')
-			if (!response.ok) return
+			if (!response.ok) throw new Error(`HTTP ${response.status}`)
 			const page = (await response.json()) as NowPage
-			if (!page.messages.length) return
+			if (!page.messages.length) throw new Error('empty feed')
 			const fragment = document.createDocumentFragment()
 			page.messages.slice(0, 3).forEach((message) => fragment.append(card(message)))
 			list.replaceChildren(fragment)
-			section.hidden = false
+			list.removeAttribute('aria-busy')
 		} catch {
 			// The homepage remains usable when the optional live feed is unavailable.
+			section.hidden = true
 		}
 	}
 
