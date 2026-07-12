@@ -1,19 +1,21 @@
 ---
-import type { MarkdownInstance } from 'astro';
-import Section from './Section.astro';
-import Card from './Card.astro';
+import type { MarkdownInstance } from 'astro'
+import Section from './Section.astro'
+import Card from './Card.astro'
 
 interface Props {
-	posts: MarkdownInstance<any>[];
+	posts: MarkdownInstance<any>[]
 }
 
-const { posts } = Astro.props;
+const { posts } = Astro.props
 ---
 
 <Section>
 	<div class="flex justify-between pb-4">
-		<p class="text-xl font-bold">最新📃</p>
-		<a href="/posts" class="underline hover:text-orange-600">浏览所有 →</a>
+		<p class="text-xl font-bold">最新文章</p>
+		<a href="/posts" class="underline decoration-stone-300 underline-offset-4 hover:text-orange-600"
+			>浏览所有 →</a
+		>
 	</div>
 	<div class="flex flex-col pb-4 md:flex-row">
 		{

@@ -1,0 +1,155 @@
+---
+import Section from './Section.astro'
+---
+
+<Section>
+	<section data-home-now hidden class="border-t border-stone-300 pb-8 pt-8 dark:border-stone-700">
+		<header class="mb-5 flex items-end justify-between gap-4">
+			<h2 class="text-xl font-bold">此刻</h2>
+			<a href="/now" class="underline decoration-stone-300 underline-offset-4 hover:text-orange-600"
+				>浏览全部 →</a
+			>
+		</header>
+
+		<div data-home-now-list class="home-now-filmstrip flex snap-x gap-3 overflow-x-auto pb-3"></div>
+	</section>
+</Section>
+
+<script>
+	import type { NowMessage, NowPage } from '@/utils/now/feed'
+
+	const section = document.querySelector<HTMLElement>('[data-home-now]')
+	const list = section?.querySelector<HTMLElement>('[data-home-now-list]')
+
+	function formatDate(timestamp: string): string {
+		const parts = new Intl.DateTimeFormat('zh-CN', {
+			timeZone: 'Asia/Shanghai',
+			month: 'long',
+			day: 'numeric',
+			hour: '2-digit',
+			minute: '2-digit',
+			hour12: false
+		}).formatToParts(new Date(timestamp))
+		const value = (type: Intl.DateTimeFormatPartTypes) =>
+			parts.find((part) => part.type === type)?.value ?? ''
+		return `${value('month')}月${value('day')}日 ${value('hour')}:${value('minute')}`
+	}
+
+	function textCardContent(message: NowMessage, dateText: string): DocumentFragment {
+		const fragment = document.createDocumentFragment()
+		const content = document.createElement('div')
+		content.className = 'flex h-full flex-col p-5 text-stone-900 dark:text-stone-100'
+		const time = document.createElement('time')
+		time.dateTime = message.timestamp
+		time.className = 'font-mono text-[9px] text-stone-500 dark:text-stone-400'
+		time.textContent = dateText
+		const text = document.createElement('p')
+		text.className = 'mt-5 line-clamp-6 text-sm font-medium leading-6'
+		text.textContent = message.text
+		const more = document.createElement('span')
+		more.className = 'mt-auto text-sm underline group-hover:text-orange-600'
+		more.textContent = '查看此刻 →'
+		content.append(time, text, more)
+		fragment.append(content)
+		return fragment
+	}
+
+	function useTextCard(anchor: HTMLAnchorElement, message: NowMessage, dateText: string) {
+		anchor.classList.remove('bg-stone-900')
+		anchor.classList.add('bg-stone-300', 'dark:bg-stone-800')
+		anchor.replaceChildren(textCardContent(message, dateText))
+	}
+
+	function imageCardContent(
+		anchor: HTMLAnchorElement,
+		message: NowMessage,
+		dateText: string
+	): DocumentFragment {
+		const fragment = document.createDocumentFragment()
+		const image = message.images[0]
+		const element = document.createElement('img')
+		element.src = `/api/now-images/${encodeURIComponent(image.id)}`
+		element.alt = ''
+		element.loading = 'lazy'
+		element.decoding = 'async'
+		element.width = image.width
+		element.height = image.height
+		element.className =
+			'h-full w-full object-cover opacity-90 transition duration-500 group-hover:scale-105'
+		element.addEventListener('error', () => useTextCard(anchor, message, dateText), { once: true })
+
+		const overlay = document.createElement('div')
+		overlay.className = 'absolute inset-0 bg-gradient-to-t from-black/85 via-black/5 to-black/10'
+		const caption = document.createElement('div')
+		caption.className = 'absolute inset-x-0 bottom-0 p-4 text-white'
+		const meta = document.createElement('div')
+		meta.className = 'mb-2 flex items-center justify-between font-mono text-[9px] text-white/60'
+		const time = document.createElement('time')
+		time.dateTime = message.timestamp
+		time.textContent = dateText
+		meta.append(time)
+		if (message.images.length > 1) {
+			const position = document.createElement('span')
+			position.textContent = `1 / ${message.images.length}`
+			meta.append(position)
+		}
+		const text = document.createElement('p')
+		text.className = 'line-clamp-2 text-sm font-medium leading-6'
+		text.textContent = message.text
+		caption.append(meta, text)
+		fragment.append(element, overlay, caption)
+
+		if (message.images.length > 1) {
+			const count = document.createElement('div')
+			count.className =
+				'absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-black/60 text-[10px] font-bold text-white backdrop-blur'
+			count.textContent = `+${message.images.length - 1}`
+			fragment.append(count)
+		}
+
+		return fragment
+	}
+
+	function card(message: NowMessage): HTMLAnchorElement {
+		const anchor = document.createElement('a')
+		anchor.href = '/now'
+		anchor.className =
+			'group relative h-64 w-[78%] shrink-0 snap-start overflow-hidden rounded-2xl sm:w-[48%] md:w-[calc(33.333%-0.5rem)]'
+		const dateText = formatDate(message.timestamp)
+		if (message.images.length) {
+			anchor.classList.add('bg-stone-900')
+			anchor.append(imageCardContent(anchor, message, dateText))
+		} else {
+			useTextCard(anchor, message, dateText)
+		}
+		return anchor
+	}
+
+	async function loadLatestNow() {
+		if (!section || !list) return
+		try {
+			const response = await fetch('/api/now.json?limit=3')
+			if (!response.ok) return
+			const page = (await response.json()) as NowPage
+			if (!page.messages.length) return
+			const fragment = document.createDocumentFragment()
+			page.messages.slice(0, 3).forEach((message) => fragment.append(card(message)))
+			list.replaceChildren(fragment)
+			section.hidden = false
+		} catch {
+			// The homepage remains usable when the optional live feed is unavailable.
+		}
+	}
+
+	void loadLatestNow()
+</script>
+
+<style>
+	.home-now-filmstrip {
+		scrollbar-width: none;
+	}
+
+	.home-now-filmstrip::-webkit-scrollbar {
+		display: none;
+	}
+</style>

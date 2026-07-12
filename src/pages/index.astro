@@ -4,12 +4,15 @@ import { AppConfig } from '@/utils/AppConfig'
 import Base from '@/layouts/Base.astro'
 import Hero from '@/components/Hero.astro'
 import LatestPosts from '@/components/LatestPosts.astro'
+import LatestNow from '@/components/LatestNow.astro'
 import { sortPostsByDate } from '@/utils/data.util'
 
 const { title } = AppConfig
 const { description } = AppConfig
 
-const allPosts = Object.values(import.meta.glob<MarkdownInstance<Record<string, any>>>('./posts/*.md', { eager: true }))
+const allPosts = Object.values(
+	import.meta.glob<MarkdownInstance<Record<string, any>>>('./posts/*.md', { eager: true })
+)
 allPosts.sort(sortPostsByDate)
 const latestPosts = allPosts.slice(0, 3)
 ---
@@ -17,4 +20,5 @@ const latestPosts = allPosts.slice(0, 3)
 <Base head={{ title, description }}>
 	<Hero />
 	<LatestPosts posts={latestPosts} />
+	<LatestNow />
 </Base>
