@@ -1,21 +1,27 @@
 ---
-import Section from './Section.astro';
+import Section from './Section.astro'
 ---
 
 <Section>
 	<div class="flex justify-between">
 		<div class="text-3xl font-bold">
-			<a href="/">
-				😇
-			</a>
+			<a href="/"> 😇 </a>
 		</div>
 		<div class="flex items-center">
 			<nav>
-				<ul class="flex-row flex">
+				<ul class="flex flex-row">
 					<li><a href="/posts" class="mr-3 hover:text-orange-600">文章</a></li>
 					<li><a href="/now" class="mr-3 hover:text-orange-600">此刻</a></li>
 					<li><a href="/tags" class="mr-3 hover:text-orange-600">标签</a></li>
 					<li><a href="/friends" class="mr-3 hover:text-orange-600">友链</a></li>
+					<li>
+						<a
+							href="/lens"
+							class="mr-3 hover:text-orange-600"
+							aria-label="方形透镜实验"
+							title="方形透镜实验">◩</a
+						>
+					</li>
 					<li><a href="/about" class="hover:text-orange-600">关于我</a></li>
 				</ul>
 			</nav>
@@ -48,41 +54,47 @@ import Section from './Section.astro';
 </Section>
 
 <script>
-	const lightSwitches = document.querySelectorAll('.light-switch');
+	const lightSwitches = document.querySelectorAll('.light-switch')
 	if (lightSwitches.length > 0) {
 		lightSwitches.forEach((lightSwitch: any, i) => {
 			if (localStorage.getItem('dark-mode') === 'true') {
 				document.documentElement.style.colorScheme = 'dark'
-				lightSwitch.checked = true;
+				lightSwitch.checked = true
 			} else {
 				document.documentElement.style.colorScheme = 'light'
 			}
 			lightSwitch.addEventListener('click', () => {
-				const { checked } = lightSwitch;
+				const { checked } = lightSwitch
 				lightSwitches.forEach((el: any, n) => {
 					if (n !== i) {
-						el.checked = checked;
+						el.checked = checked
 					}
-				});
+				})
 				if (lightSwitch.checked) {
-					document.documentElement.classList.add('dark');
+					document.documentElement.classList.add('dark')
 					// 获取html的DOM元素，给其style加上color-scheme，为了适配滚动条的暗黑模式
 					document.documentElement.style.colorScheme = 'dark'
-					localStorage.setItem('dark-mode', 'true');
-					const iframe: any = document.querySelector('iframe.giscus-frame');
+					localStorage.setItem('dark-mode', 'true')
+					const iframe: any = document.querySelector('iframe.giscus-frame')
 					if (iframe) {
-						iframe.contentWindow.postMessage({ giscus: { setConfig: { theme: "dark" } } }, 'https://giscus.app');
+						iframe.contentWindow.postMessage(
+							{ giscus: { setConfig: { theme: 'dark' } } },
+							'https://giscus.app'
+						)
 					}
 				} else {
-					document.documentElement.classList.remove('dark');
+					document.documentElement.classList.remove('dark')
 					document.documentElement.style.colorScheme = 'light'
-					localStorage.setItem('dark-mode', 'false');
-					const iframe: any = document.querySelector('iframe.giscus-frame');
+					localStorage.setItem('dark-mode', 'false')
+					const iframe: any = document.querySelector('iframe.giscus-frame')
 					if (iframe) {
-						iframe.contentWindow.postMessage({ giscus: { setConfig: { theme: "light" } } }, 'https://giscus.app');
+						iframe.contentWindow.postMessage(
+							{ giscus: { setConfig: { theme: 'light' } } },
+							'https://giscus.app'
+						)
 					}
 				}
-			});
-		});
+			})
+		})
 	}
 </script>
