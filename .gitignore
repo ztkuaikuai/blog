@@ -28,3 +28,6 @@ example.md
 
 # build
 .vercel/
+
+# astro generated
+.astro/
